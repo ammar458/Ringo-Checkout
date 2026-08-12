@@ -52,6 +52,7 @@ require_once RINGO_CHECKOUT_DIR . 'admin/settings-page.php';
 require_once RINGO_CHECKOUT_DIR . 'admin/addons-page.php';
 require_once RINGO_CHECKOUT_DIR . 'admin/payments-page.php';
 require_once RINGO_CHECKOUT_DIR . 'admin/delete-action.php';
+require_once RINGO_CHECKOUT_DIR . 'admin/mark-paid-action.php';
 require_once RINGO_CHECKOUT_DIR . 'admin/logs-page.php';
 require_once RINGO_CHECKOUT_DIR . 'admin/dashboard-widget.php';
 require_once RINGO_CHECKOUT_DIR . 'admin/coupons-page.php';

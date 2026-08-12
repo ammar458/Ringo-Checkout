@@ -57,6 +57,12 @@ function ringo_render_payments_page() {
 			</div>
 		<?php endif; ?>
 
+		<?php if ( ! empty( $_GET['marked_paid'] ) ) : ?>
+			<div class="notice notice-success is-dismissible">
+				<p>Marked listing ID <strong><?php echo esc_html( (int) $_GET['marked_paid'] ); ?></strong> as paid.</p>
+			</div>
+		<?php endif; ?>
+
 		<!-- Status filter tabs -->
 		<div style="margin:12px 0;">
 			<?php
@@ -186,6 +192,16 @@ function ringo_render_payment_row( $post_id ) {
 	$trash_url = add_query_arg( $delete_base_args, admin_url( 'admin.php' ) );
 	$force_url = add_query_arg( array_merge( $delete_base_args, [ 'force' => 1 ] ), admin_url( 'admin.php' ) );
 
+	$mark_paid_url = add_query_arg(
+		[
+			'page'         => 'ringo-stripe-payments',
+			'ringo_action' => 'mark_paid_row',
+			'post_id'      => $post_id,
+			'_wpnonce'     => wp_create_nonce( 'ringo_mark_paid_' . $post_id ),
+		],
+		admin_url( 'admin.php' )
+	);
+
 	echo '<tr>';
 	echo '<td>' . esc_html( $post_id ) . '</td>';
 	echo '<td>' . esc_html( $post ? $post->post_status : '—' ) . '</td>';
@@ -205,6 +221,11 @@ function ringo_render_payment_row( $post_id ) {
 	echo '<td>' .
 		// ✨ View Boat button (no icon)
 		'<a class="button button-small" href="' . esc_url( get_permalink( $post_id ) ) . '" target="_blank" rel="noopener" style="color:#0a6ebd;border-color:#0a6ebd;">View</a> ' .
+		( $pay_status !== 'paid'
+			? '<a class="button button-small" style="color:#0a8043;border-color:#0a8043;" href="' . esc_url( $mark_paid_url ) . '" ' .
+				'onclick="return confirm(\'Mark listing ' . esc_js( $post_id ) . ' as PAID? This will publish it and send the payment confirmation emails.\');">Mark Paid</a> '
+			: ''
+		) .
 		'<a class="button button-small" href="' . esc_url( $trash_url ) . '" ' .
 			'onclick="return confirm(\'Trash listing ' . esc_js( $post_id ) . '?\');">Trash</a> ' .
 		'<a class="button button-small" style="color:#b32d2e;border-color:#b32d2e;" href="' . esc_url( $force_url ) . '" ' .
