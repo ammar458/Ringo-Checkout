@@ -99,14 +99,13 @@ function ringo_render_payments_page() {
 				<th style="width:90px;">Amount</th>
 				<th style="width:220px;">Email</th>
 				<th style="width:160px;">Created</th>
-				<th style="width:90px;">Checkout</th>
 				<th style="width:200px;">Actions</th>
 			</tr>
 			</thead>
 			<tbody>
 			<?php
 			if ( empty( $q->posts ) ) {
-				echo '<tr><td colspan="12">No records found.</td></tr>';
+				echo '<tr><td colspan="11">No records found.</td></tr>';
 			} else {
 				foreach ( $q->posts as $post_id ) {
 					ringo_render_payment_row( $post_id );
@@ -170,11 +169,6 @@ function ringo_render_payment_row( $post_id ) {
 		$created_human = date_i18n( 'Y-m-d H:i', strtotime( $post->post_date ) );
 	}
 
-	$checkout_url = (string) get_post_meta( $post_id, '_ringo_checkout_url', true );
-	if ( ! $checkout_url ) {
-		$checkout_url = (string) get_post_meta( $post_id, '_ringo_checkout_url_last', true );
-	}
-
 	// ✨ NEW: Get boat video URL
 	$video_url = (string) get_post_meta( $post_id, '_boat_video_url', true );
 	if ( ! $video_url ) {
@@ -213,11 +207,6 @@ function ringo_render_payment_row( $post_id ) {
 	echo '<td>' . esc_html( $amount_display ) . '</td>';
 	echo '<td>' . esc_html( $email ) . '</td>';
 	echo '<td>' . esc_html( $created_human ) . '</td>';
-	echo '<td>' . (
-		$checkout_url
-			? '<a class="button button-small" target="_blank" rel="noopener" href="' . esc_url( $checkout_url ) . '">Open</a>'
-			: '—'
-	) . '</td>';
 	echo '<td>' .
 		// ✨ View Boat button (no icon)
 		'<a class="button button-small" href="' . esc_url( get_permalink( $post_id ) ) . '" target="_blank" rel="noopener" style="color:#0a6ebd;border-color:#0a6ebd;">View</a> ' .
