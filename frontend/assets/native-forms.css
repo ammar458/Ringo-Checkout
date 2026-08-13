@@ -987,7 +987,7 @@
 }
 
 .ringo-native-start-form {
-  margin-top: 18px;
+  margin-top: 18px !important;
 }
 
 .ringo-native-selected-options {
