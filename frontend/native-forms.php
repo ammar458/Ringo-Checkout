@@ -1296,7 +1296,7 @@ function ringo_native_package_category_term_id( $package ) {
  * Build a boat-ID based filename for an uploaded image, keeping its original extension.
  *
  * @param string $original_name Original uploaded filename.
- * @param string $slug          Filename base, e.g. "boatid-42-cover" or "boatid-42-gallery-1".
+ * @param string $slug          Filename base, e.g. "42-cover" or "42-gallery-1".
  * @return string
  */
 function ringo_native_build_upload_filename( $original_name, $slug ) {
@@ -1350,7 +1350,7 @@ function ringo_native_handle_single_upload( $field, $post_id ) {
 		return $valid;
 	}
 
-	$_FILES[ $field ]['name'] = ringo_native_build_upload_filename( $_FILES[ $field ]['name'], 'boatid-' . $post_id . '-cover' );
+	$_FILES[ $field ]['name'] = ringo_native_build_upload_filename( $_FILES[ $field ]['name'], $post_id . '-cover' );
 
 	require_once ABSPATH . 'wp-admin/includes/file.php';
 	require_once ABSPATH . 'wp-admin/includes/media.php';
@@ -1412,7 +1412,7 @@ function ringo_native_handle_gallery_upload( $field, $post_id, $max_files, $star
 		}
 
 		$seq++;
-		$file['name'] = ringo_native_build_upload_filename( $file['name'], 'boatid-' . $post_id . '-gallery-' . $seq );
+		$file['name'] = ringo_native_build_upload_filename( $file['name'], $post_id . '-gallery-' . $seq );
 
 		$_FILES['ringo_gallery_upload'] = $file;
 		$attachment_id                  = media_handle_upload( 'ringo_gallery_upload', $post_id );
