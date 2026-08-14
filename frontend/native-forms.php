@@ -1293,6 +1293,25 @@ function ringo_native_package_category_term_id( $package ) {
 }
 
 /**
+ * Build a boat-ID based filename for an uploaded image, keeping its original extension.
+ *
+ * @param string $original_name Original uploaded filename.
+ * @param string $slug          Filename base, e.g. "boatid-42-cover" or "boatid-42-gallery-1".
+ * @return string
+ */
+function ringo_native_build_upload_filename( $original_name, $slug ) {
+	$ext = strtolower( pathinfo( (string) $original_name, PATHINFO_EXTENSION ) );
+	if ( 'jpeg' === $ext ) {
+		$ext = 'jpg';
+	}
+	if ( ! in_array( $ext, [ 'jpg', 'png', 'webp' ], true ) ) {
+		$ext = 'jpg';
+	}
+
+	return $slug . '.' . $ext;
+}
+
+/**
  * Validate that an uploaded file is an allowed image before WordPress handles it.
  *
  * @param array<string,mixed> $file File array.
@@ -1331,6 +1350,8 @@ function ringo_native_handle_single_upload( $field, $post_id ) {
 		return $valid;
 	}
 
+	$_FILES[ $field ]['name'] = ringo_native_build_upload_filename( $_FILES[ $field ]['name'], 'boatid-' . $post_id . '-cover' );
+
 	require_once ABSPATH . 'wp-admin/includes/file.php';
 	require_once ABSPATH . 'wp-admin/includes/media.php';
 	require_once ABSPATH . 'wp-admin/includes/image.php';
@@ -1341,12 +1362,13 @@ function ringo_native_handle_single_upload( $field, $post_id ) {
 /**
  * Handle a multiple gallery upload.
  *
- * @param string $field     File field name.
- * @param int    $post_id   Parent post ID.
- * @param int    $max_files Maximum accepted images.
+ * @param string $field        File field name.
+ * @param int    $post_id      Parent post ID.
+ * @param int    $max_files    Maximum accepted images.
+ * @param int    $start_index  Sequence number to start naming gallery images from (0-based offset).
  * @return array<int,int>|WP_Error
  */
-function ringo_native_handle_gallery_upload( $field, $post_id, $max_files ) {
+function ringo_native_handle_gallery_upload( $field, $post_id, $max_files, $start_index = 0 ) {
 	if ( empty( $_FILES[ $field ]['name'] ) || ! is_array( $_FILES[ $field ]['name'] ) ) {
 		return new WP_Error( 'missing_gallery', 'Please upload at least one gallery image.' );
 	}
@@ -1365,6 +1387,7 @@ function ringo_native_handle_gallery_upload( $field, $post_id, $max_files ) {
 
 	$original = $_FILES;
 	$ids      = [];
+	$seq      = $start_index;
 
 	for ( $i = 0; $i < count( $_FILES[ $field ]['name'] ); $i++ ) {
 		if ( empty( $_FILES[ $field ]['name'][ $i ] ) ) {
@@ -1387,6 +1410,9 @@ function ringo_native_handle_gallery_upload( $field, $post_id, $max_files ) {
 			$_FILES = $original;
 			return $valid;
 		}
+
+		$seq++;
+		$file['name'] = ringo_native_build_upload_filename( $file['name'], 'boatid-' . $post_id . '-gallery-' . $seq );
 
 		$_FILES['ringo_gallery_upload'] = $file;
 		$attachment_id                  = media_handle_upload( 'ringo_gallery_upload', $post_id );
@@ -2023,7 +2049,7 @@ function ringo_ajax_native_update_boat() {
 	$new_gallery_ids = [];
 	if ( $new_count > 0 ) {
 		$remaining_slots = max( 1, $max_gallery - count( $kept_gallery ) );
-		$new_gallery_ids = ringo_native_handle_gallery_upload( 'gallery', $post_id, $remaining_slots );
+		$new_gallery_ids = ringo_native_handle_gallery_upload( 'gallery', $post_id, $remaining_slots, count( $kept_gallery ) );
 		if ( is_wp_error( $new_gallery_ids ) ) {
 			ringo_native_cleanup_edit_attachments( $new_attachments );
 			delete_transient( $lock );
