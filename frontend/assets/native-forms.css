@@ -197,6 +197,53 @@
   color: var(--ringo-red);
 }
 
+.ringo-native-info {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  margin-left: 4px;
+  border: 1px solid #5f7891;
+  border-radius: 50%;
+  color: #5f7891;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1;
+  cursor: help;
+  vertical-align: 1px;
+}
+
+.ringo-native-info > span {
+  position: absolute;
+  left: calc(100% + 9px);
+  top: 50%;
+  z-index: 20;
+  min-width: 260px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: #222;
+  box-shadow: 0 10px 24px rgba(18, 30, 44, .22);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%) translateX(-4px);
+  transition: opacity .16s ease, transform .16s ease;
+  white-space: nowrap;
+}
+
+.ringo-native-info:hover > span,
+.ringo-native-info:focus > span,
+.ringo-native-info:focus-visible > span {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
 .ringo-native-field input:not([type="checkbox"]):not([type="radio"]),
 .ringo-native-field select,
 .ringo-native-field textarea {
